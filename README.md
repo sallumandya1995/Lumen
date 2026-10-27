@@ -5,16 +5,18 @@
 Lumen is a workspace for understanding how an LLM makes its choices, and for keeping AI agents under human control. It runs on **NVIDIA Nemotron** through **Nebius Token Factory**.
 
 Built for the Nebius x NVIDIA Global AI Hackathon.
+ 
 
-<img src="docs/lumen-home.png" alt="Lumen home screen" width="520">
+<img width="1269" height="724" alt="image" src="https://github.com/user-attachments/assets/f9b5ffa2-8ed2-41a6-b4f4-a6be96289607" />
 
-## Demo
+
+## Demo on youyube
 
 [![Lumen demo video, click to watch](docs/demo-1m10.png)](https://youtu.be/184OR9FK-8s?t=70)
 
 Click the image to watch the full demo on YouTube (it opens at 1:10, where the product walkthrough starts): https://youtu.be/184OR9FK-8s
 
-- Live app: https://azure-glass-chat.dewygrass128.chatgpt.site
+- Live app on chatgpt sites: https://azure-glass-chat.dewygrass128.chatgpt.site
 
 ## Why I built this
 
