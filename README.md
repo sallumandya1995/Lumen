@@ -5,9 +5,9 @@
 Lumen is a workspace for understanding how an LLM makes its choices, and for keeping AI agents under human control. It runs on **NVIDIA Nemotron** through **Nebius Token Factory**.
 
 Built for the Nebius x NVIDIA Global AI Hackathon.
- 
 
-<img width="1269" height="724" alt="image" src="https://github.com/user-attachments/assets/f9b5ffa2-8ed2-41a6-b4f4-a6be96289607" />
+  <img width="615" height="895" alt="image" src="https://github.com/user-attachments/assets/e3be076a-db87-4861-8b94-b92b528c0858" />
+
 
 
 ## Demo on youyube
