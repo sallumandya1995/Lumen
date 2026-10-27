@@ -1,16 +1,4 @@
----
-title: Lumen
-emoji: 💡
-colorFrom: green
-colorTo: blue
-sdk: gradio
-app_file: app.py
-python_version: '3.11'
-fullWidth: true
-startup_duration_timeout: 1h
-license: mit
-short_description: Explainable AI, guided generation, experiments, and agent governance
----
+ 
 
 # Lumen. — actual standalone application
 
