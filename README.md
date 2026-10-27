@@ -6,7 +6,8 @@ Lumen is a workspace for understanding how an LLM makes its choices, and for kee
 
 Built for the Nebius x NVIDIA Global AI Hackathon.
 
-<img src="docs/lumen-home.png" alt="Lumen home screen" width="520">
+<img width="615" height="895" alt="image" src="https://github.com/user-attachments/assets/36abaed3-584b-423f-8d1d-9df2dd64da6e" />
+
 
 ## Demo
 
@@ -58,33 +59,6 @@ The human gate has three steps: **detect** a policy signal or sensitive action, 
 - **Nemotron 3 Ultra** is the default model for chat, guided generation, agent runs and the governance copilot. I used it as-is, with prompt engineering only and no fine-tuning.
 - **Nebius Token Factory** serves every live model call and returns the token logprobs and top alternatives that make inspection possible.
 - **Other Token Factory models** (DeepSeek V4 Pro, for example) can be compared against Nemotron in Experiments. Model choice is configurable per chat, variant and agent.
-
-## Run it
-
-**Hugging Face Space (Gradio)**
-
-1. Create a **Gradio** Space and upload all files to the repository root.
-2. Add a Space secret named `NEBIUS_API_KEY` with your own Nebius Token Factory key.
-3. Commit and wait for the build. The Space installs dependencies, builds the frontend and server, and starts the app.
-4. Open the App tab.
-
-**Locally:** see [SPACE_SETUP.md](SPACE_SETUP.md) for local startup, storage notes and the runtime architecture.
-
-No API key is included in this repo. The database is **ephemeral by default** and starts fresh, so don't rely on it for long-term history.
-
-## Feedback on Nebius Token Factory and NVIDIA
-
-**What worked well**
-- Logprobs and top alternatives through Token Factory made token inspection and guided generation possible.
-- Nemotron 3 Ultra gave sharp, readable distributions that made the refusal and prefix-steering demos clear.
-- Running one prompt across many models on one platform made controlled comparisons easy.
-
-**What I'd improve**
-- A docs matrix showing which models return logprobs and how many alternatives.
-- Consistent per-response token and cost metadata for governance dashboards.
-- Examples for scoped tool access, approval gates and audit logging on Token Factory.
-
-**For NVIDIA:** documentation on expected logprob behavior for Nemotron, and safety-evaluation guidance for agentic use.
 
 ## What's next
 
