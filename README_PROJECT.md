@@ -2,6 +2,9 @@
 
 **Clarity for AI. Confidence in control.**
 
+<img width="308" height="448" alt="image" src="https://github.com/user-attachments/assets/77fcb517-8123-4132-96ad-2c4213647433" />
+
+
 Built by [Arsalan](https://www.linkedin.com/in/sallu-mandya/) for the **Nebius × NVIDIA Global AI Hackathon**. Lumen combines explainable chat, guided generation, prompt/model experiments, agent design, and governance.
 
 **Demo:** https://azure-glass-chat.dewygrass128.chatgpt.site/
