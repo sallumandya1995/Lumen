@@ -6,14 +6,14 @@ Lumen is a workspace for understanding how an LLM makes its choices, and for kee
 
 Built for the Nebius x NVIDIA Global AI Hackathon.
 
-<img width="615" height="895" alt="image" src="https://github.com/user-attachments/assets/36abaed3-584b-423f-8d1d-9df2dd64da6e" />
-
+<img src="docs/lumen-home.png" alt="Lumen home screen" width="520">
 
 ## Demo
 
-[![Lumen demo video](https://img.youtube.com/vi/184OR9FK-8s/maxresdefault.jpg)](https://www.youtube.com/watch?v=184OR9FK-8s)
+[![Lumen demo video, click to watch](docs/demo-1m10.png)](https://youtu.be/184OR9FK-8s?t=70)
 
-- Video: https://www.youtube.com/watch?v=184OR9FK-8s
+Click the image to watch the full demo on YouTube (it opens at 1:10, where the product walkthrough starts): https://youtu.be/184OR9FK-8s
+
 - Live app: https://azure-glass-chat.dewygrass128.chatgpt.site
 
 ## Why I built this
