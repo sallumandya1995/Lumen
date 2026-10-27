@@ -1,0 +1,21 @@
+# Lumen policy configuration
+# Edit the rules below, then validate before saving.
+# Stages: Input, Tool, Output. Actions: Block, Require approval, Flag.
+version: 1
+scope: agent
+agent_id: a-research
+policies:
+  - id: guard-0
+    name: Public sources only
+    description: Enforce public sources only for the assigned agent context.
+    enabled: true
+    stage: Tool
+    action: Block
+    severity: Medium
+  - id: guard-1
+    name: PII redaction
+    description: Enforce pii redaction for the assigned agent context.
+    enabled: true
+    stage: Input
+    action: Block
+    severity: Medium

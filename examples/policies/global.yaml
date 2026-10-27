@@ -1,0 +1,32 @@
+# Lumen policy configuration
+# Edit the rules below, then validate before saving.
+# Stages: Input, Tool, Output. Actions: Block, Require approval, Flag.
+version: 1
+scope: global
+policies:
+  - id: protect-credentials
+    name: Protect credentials
+    description: Block attempts to reveal, extract, or expose passwords, API keys, access tokens, or
+      other credentials. Allow general safety guidance and discussion about credential handling that
+      does not disclose secrets.
+    enabled: true
+    stage: Input
+    action: Block
+    severity: High
+  - id: tenant-isolation
+    name: Tenant isolation
+    description: Block accessing or returning another tenant's data beyond the assigned tenant scope.
+      Read-only lookups confined to the assigned tenant are allowed.
+    enabled: true
+    stage: Tool
+    action: Block
+    severity: High
+  - id: review-external-actions
+    name: Review external actions
+    description: Require approval only before actually sending messages, changing external records,
+      making payments, or performing destructive external actions. Read-only lookups, drafts, and
+      internal summaries do not require approval.
+    enabled: true
+    stage: Tool
+    action: Require approval
+    severity: High

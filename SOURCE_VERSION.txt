@@ -1,0 +1,6 @@
+Lumen source: published version 59
+Commit: a451f05a3a0ef7d445256ab1ed84ef2a88a5adea
+Export: 2026-10-27
+Standalone Python launcher and local Worker deployment adapter included.
+Dependencies and checksum-verified fonts download during initial startup.
+API keys and runtime history are not included.

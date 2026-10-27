@@ -1,0 +1,3 @@
+import './globals.css';
+export const metadata = {title:'Lumen · Clarity for AI',description:'Clarity for AI. Confidence in control. Lumen brings transparency to model choices and visibility to agent governance and safety.',icons:{icon:{url:'/favicon.svg',type:'image/svg+xml'}}};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><head><link rel="preload" href="/fonts/audiowide-regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous"/><link rel="preload" href="/fonts/barlow-regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous"/></head><body>{children}</body></html>}

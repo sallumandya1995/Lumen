@@ -1,0 +1,32 @@
+[
+  {
+    "path": "public/fonts/audiowide-regular.ttf",
+    "url": "https://fonts.gstatic.com/s/audiowide/v22/l7gdbjpo0cum0ckerWCtkQ.ttf",
+    "sha256": "c42a74135f7f527e69a16826220cece45ec376776cfacdfd6cfd750053215146"
+  },
+  {
+    "path": "public/fonts/barlow-regular.ttf",
+    "url": "https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7EPCw.ttf",
+    "sha256": "a35caa4687f434d66453c1fe423d7074cfa9fd7ab80c19b0780f3862887d2fc9"
+  },
+  {
+    "path": "public/fonts/barlow-medium.ttf",
+    "url": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3_-gc4A.ttf",
+    "sha256": "91c841fdfa8e7b94ffedbb983a363947ba6ed720f3bbf0c71d48b618053655bc"
+  },
+  {
+    "path": "public/fonts/barlow-semibold.ttf",
+    "url": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E30-8c4A.ttf",
+    "sha256": "c15439e7a03af5714282ec1780ff7b0214ec6a7db96300b54928dbcd2569ca0c"
+  },
+  {
+    "path": "public/fonts/barlow-bold.ttf",
+    "url": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3t-4c4A.ttf",
+    "sha256": "74103fd6d41bc32c63aa2e6eb3db619ddb80ce9ca1b1420d5548a23b8ee5d154"
+  },
+  {
+    "path": "public/fonts/DejaVuSans.ttf",
+    "url": "https://raw.githubusercontent.com/matplotlib/matplotlib/v3.10.0/lib/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf",
+    "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+  }
+]

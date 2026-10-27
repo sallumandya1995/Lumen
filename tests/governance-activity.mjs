@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {activityStore,isHistoricalRun} from '../lib/governance/activity.ts';
+const runs=[{id:'studio',source:'live',provenance:'studio'},{id:'external',source:'live',provenance:'external'},{id:'sample'},{id:'import',source:'live',provenance:'browser-import'}];
+const linked=id=>({id:'review-'+id,runId:id});
+const store={runs,toolCalls:runs.map(r=>linked(r.id)),policies:runs.map(r=>linked(r.id)),approvals:runs.map(r=>({id:'approval-'+r.id,runId:r.id})),assignments:runs.map(r=>({id:'assignment-'+r.id,reviewId:'review-'+r.id})),audit:[{id:'AU-SIM-1',target:'sample'},{id:'actual',target:'studio'},{id:'configuration',target:'agent'}],agents:[{id:'agent'}],definitions:[{agentId:'agent'}]};
+const original=structuredClone(store),live=activityStore(store,'live');
+assert.deepEqual(live.runs.map(r=>r.id),['studio','external']);
+for(const key of ['toolCalls','policies','approvals'])assert(live[key].every(r=>['studio','external'].includes(r.runId)));
+assert.deepEqual(live.assignments.map(a=>a.id),['assignment-studio','assignment-external']);
+assert(!live.audit.some(a=>a.id==='AU-SIM-1'));assert(live.audit.some(a=>a.id==='configuration'));
+assert.deepEqual(activityStore(store,'historical').runs.map(r=>r.id),['sample','import']);
+assert.equal(activityStore(store,'all'),store);assert.deepEqual(store,original);
+assert.equal(live.agents,store.agents);assert.equal(live.definitions,store.definitions);
+assert.equal(isHistoricalRun(runs[3]),true);assert.equal(isHistoricalRun(runs[0]),false);
+console.log('PASS: live dashboards exclude seeded and unverified imported records, preserve linked relationships and agent configurations, and do not mutate stored history.');

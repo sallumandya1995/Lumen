@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "lumen-connectors"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "Agent-scoped OTLP JSON telemetry for Lumen governance"
+[project.optional-dependencies]
+langgraph = ["langgraph>=0.6,<2", "langchain-core>=0.3,<2"]
+crewai = ["crewai>=1.15,<2"]
+mcp = ["mcp>=1.12,<2"]
+verify = ["cryptography>=42", "rfc8785>=0.1"]
+[tool.setuptools.packages.find]
+include = ["lumen_connectors*"]

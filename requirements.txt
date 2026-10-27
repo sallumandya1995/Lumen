@@ -1,0 +1,2 @@
+# Python entry point uses only the standard library.
+# JavaScript dependencies are installed from the included pnpm lockfile.

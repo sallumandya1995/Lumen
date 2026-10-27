@@ -1,0 +1,2 @@
+# Optional sample node/adapter; uses the current official SDK v2 API.
+mcp[cli]>=2,<3

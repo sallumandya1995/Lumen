@@ -1,0 +1,7 @@
+# Lumen policy configuration
+# Edit the rules below, then validate before saving.
+# Stages: Input, Tool, Output. Actions: Block, Require approval, Flag.
+version: 1
+scope: agent
+agent_id: a-lumen-demo
+policies: []

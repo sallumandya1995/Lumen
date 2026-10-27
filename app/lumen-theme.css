@@ -1,0 +1,14 @@
+/* One product palette and navigation language across every workspace. */
+:root{--lumen-ink:#062b3f;--lumen-muted:#526b79;--lumen-accent:#d8ff35;--lumen-border:#d9e2e7;--lumen-surface:#f0f4f6;--lumen-glass:linear-gradient(145deg,#ffffffed,#f7faf5da);--ink:var(--lumen-ink);--muted:var(--lumen-muted);--lime:var(--lumen-accent);--line:var(--lumen-border)}
+.lumen-workspace :is(.gov-shell,.studio-shell){color:var(--ink);--g-border:var(--line);--s-border:var(--line);--g-muted:var(--muted);--s-muted:var(--muted);background-color:var(--lumen-surface);font-family:var(--font)}
+.lumen-workspace :is(.mode-tabs,.gov-topbar,.studio-topbar){background:var(--lumen-glass);border-color:var(--line);color:var(--ink)}
+.lumen-workspace :is(.gov-sidebar,.studio-sidebar){background:var(--lumen-glass);border-color:var(--line)}
+.lumen-workspace :is(.mode-options button,.studio-section-tabs button,.gov-sidebar nav button,.studio-agent-list button){font-family:var(--font);font-weight:600;border-radius:10px;transition:background .16s,border-color .16s,color .16s}
+.lumen-workspace :is(.mode-options button.active,.gov-sidebar nav button.active,.studio-section-tabs button.active,.studio-agent-list button.selected){color:var(--ink);border-color:#c6e963;background:linear-gradient(140deg,#e8ff92,var(--lime));box-shadow:inset 0 1px 0 #ffffffb3}
+.lumen-workspace :is(.mode-options button,.gov-sidebar nav button,.studio-section-tabs button):focus-visible{outline:3px solid #658819;outline-offset:2px}
+.gov-data-source{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:14px 17px;margin:0 0 20px;border:1px solid var(--line);border-radius:13px;background:var(--lumen-glass);font:14px var(--font);color:var(--ink)}
+.gov-data-source label{display:flex;gap:9px;align-items:center;font-weight:600}.gov-data-source select{border:1px solid #cfddc4;background:#fff;border-radius:8px;padding:7px;color:var(--ink);font:inherit;max-width:100%}.gov-data-source>span{font-size:12px;color:var(--muted)}
+.gov-historical-badge{display:inline-flex;align-items:center;border:1px solid #d7cfb4;background:#faf5e7;color:#725d29;border-radius:20px;padding:3px 8px;font:600 11px var(--font);white-space:nowrap;margin:3px 0}
+.gov-live-empty{padding:20px;border:1px solid #d0e0b3;border-radius:13px;background:#f5faeb;margin-bottom:20px}.gov-live-empty p{font-size:14px;line-height:1.7;color:var(--muted)}
+@media(min-width:751px) and (max-width:1350px){.lumen-workspace .mode-tabs{flex-wrap:wrap}.lumen-workspace .mode-options{order:3;width:100%;justify-content:space-between}.lumen-workspace .workspace-mark{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.lumen-workspace :is(.mode-options button,.gov-sidebar nav button,.studio-section-tabs button){transition:none}}

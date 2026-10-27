@@ -1,0 +1,85 @@
+import ts from 'typescript';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+import assert from 'node:assert/strict';
+const dir=new URL('../.sites-runtime/gov-tests/',import.meta.url);await mkdir(dir,{recursive:true});
+for(const name of ['types','policy-config','end-to-end-demo','definitions','mock-data','recent-simulation','service']){const source=await readFile(new URL(`../lib/governance/${name==='service'?'store-core':name}.ts`,import.meta.url),'utf8');const {outputText}=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}});await writeFile(new URL(name+'.mjs',dir),outputText.replace("from '../models.mjs'","from './models.mjs'").replace(/from '\.\/(mock-data|recent-simulation|types|policy-config|end-to-end-demo|definitions)'/g,"from './$1.mjs'"))}
+await writeFile(new URL('models.mjs',dir),await readFile(new URL('../lib/models.mjs',import.meta.url)));
+const {createMockService,scopeStore,isUsableSnapshot,createFastApiService}=await import(new URL('service.mjs',dir));
+const {createSeed}=await import(new URL('mock-data.mjs',dir));
+const {configurationFrom}=await import(new URL('definitions.mjs',dir));
+const seed=createSeed();
+// Export the same deterministic relationships for the Python dummy service.
+await writeFile(new URL('seed.json',dir),JSON.stringify(seed,null,2)+'\n');
+const service=createMockService();let state=await service.load();
+function valid(s){const agents=new Set(s.agents.map(a=>a.id)),runs=new Set(s.runs.map(r=>r.id)),users=new Set(s.users.map(u=>u.id));for(const item of [...s.runs,...s.approvals,...s.policies,...s.toolCalls])assert(agents.has(item.agentId));for(const item of [...s.approvals,...s.policies,...s.toolCalls])assert(runs.has(item.runId));for(const review of [...s.approvals,...s.policies])if(review.assigneeId)assert(users.has(review.assigneeId));assert.equal(new Set(s.approvals.map(a=>a.id)).size,s.approvals.length)}
+valid(state);assert(isUsableSnapshot(state));assert.equal(state.users.find(u=>u.id==='u-owner').name,'Workspace owner');assert.equal(state.definitions.length,state.agents.length);assert.equal(new Set(state.toolCalls.map(t=>t.name)).size,5);for(const run of state.runs)assert(run.duration>=run.steps.reduce((n,s)=>n+s.duration,0));
+const owner=state.users.find(u=>u.role==='Owner'),sme=state.users.find(u=>u.id==='u-sme');
+const target=state.approvals.find(a=>a.status==='Pending'&&sme.agentIds.includes(a.agentId));assert(target);
+await service.assign(target.id,sme.id,'Privacy review',owner.id);
+await assert.rejects(()=>service.assign(target.id,sme.id,'Duplicate',owner.id),/already assigned/);
+let scoped=scopeStore(await service.load(),sme);assert(scoped.approvals.every(a=>a.assigneeId===sme.id));assert.equal(scoped.connectors.length,0);
+await assert.rejects(()=>service.decide(state.approvals.find(a=>a.id!==target.id&&a.assigneeId!==sme.id).id,'Approved','outside scope',sme.id),/permissions/);
+await service.decide(target.id,'Approved','Masked recipient and scope verified.',sme.id);
+await assert.rejects(()=>service.decide(target.id,'Rejected','Second decision',sme.id),/no longer pending/);
+state=await service.load();assert.equal(state.approvals.find(a=>a.id===target.id).status,'Approved');assert(state.audit.some(a=>a.target===target.id&&a.action==='Approval approved'));assert(state.assignments.some(a=>a.reviewId===target.id&&a.toId===sme.id));
+const policy=state.policies.find(p=>p.status!=='Resolved');await service.resolve(policy.id,'Scope corrected; sandbox verification complete.',owner.id);
+const draft={name:'Test node',framework:'CrewAI',type:'MCP',endpoint:'https://test.example.invalid/mcp'};
+assert((await service.testConnector(draft,owner.id)).ok);
+assert(!(await service.testConnector({...draft,endpoint:'https://fail.example.invalid/mcp'},owner.id)).ok);
+await assert.rejects(()=>service.testConnector({...draft,endpoint:'https://user:secret@example.invalid'},owner.id),/credentials/);
+await assert.rejects(()=>service.saveConnector(draft,sme.id),/management/);
+await service.saveConnector(draft,owner.id);state=await service.load();assert(state.connectors.some(c=>c.name==='Test node'&&c.status==='Not tested'));
+for(let i=0;i<200;i++)service.tick();state=await service.load();valid(state);assert(state.sequence===296);assert(state.audit.length<=300);
+await service.reset();assert.equal((await service.load()).sequence,96);
+// An admin must retain visibility of a newly saved unbound connector and its audit record.
+const admin=(await service.load()).users.find(u=>u.role==='Admin');
+await service.saveConnector({...draft,name:'Admin connector',endpoint:'https://admin.example.invalid/mcp'},admin.id);
+const adminView=scopeStore(await service.load(),admin);
+const ownConnector=adminView.connectors.find(c=>c.name==='Admin connector');assert(ownConnector);assert(adminView.audit.some(a=>a.target===ownConnector.id));
+await assert.rejects(()=>service.setAvailability('u-finance',true,admin.id),/outside your assigned/);
+// Shared configuration updates are atomic, scoped, versioned, and reflected in later dummy telemetry.
+const configAgent='a-support';state=await service.load();
+const configuration=configurationFrom(state.agents.find(a=>a.id===configAgent),state.definitions.find(d=>d.agentId===configAgent));
+const historical=JSON.stringify(state.runs.filter(r=>r.agentId===configAgent));
+configuration.agent.name='Configured Care Crew';configuration.agent.tools=['crm_lookup'];
+configuration.definition.nodes.forEach(n=>{if(n.kind==='Tool'&&n.toolName!=='crm_lookup')n.enabled=false});
+configuration.definition.guardrails[0].name='Reviewed external delivery';configuration.definition.model.maxTokens=512;
+await assert.rejects(()=>service.saveAgentConfiguration(configAgent,configuration,sme.id),/admin access/);
+const invalid=structuredClone(configuration);invalid.definition.edges.push({id:'bad-cycle',source:'output',target:'input',label:''});
+await assert.rejects(()=>service.saveAgentConfiguration(configAgent,invalid,owner.id),/acyclic/);
+const beforeInvalid=await service.load();assert.equal(beforeInvalid.definitions.find(d=>d.agentId===configAgent).revision,configuration.expectedRevision);
+const unsafe=structuredClone(configuration);unsafe.agent.id='injected';unsafe.agent.ownerId='u-sme';unsafe.definition.agentId='injected';
+await service.saveAgentConfiguration(configAgent,unsafe,admin.id);
+state=await service.load();const savedAgent=state.agents.find(a=>a.id===configAgent),savedDefinition=state.definitions.find(d=>d.agentId===configAgent);
+assert.equal(savedAgent.name,'Configured Care Crew');assert.equal(savedAgent.ownerId,'u-admin');assert.deepEqual(savedAgent.tools,['crm_lookup']);assert(savedAgent.policies.includes('Reviewed external delivery'));assert.equal(savedDefinition.revision,configuration.expectedRevision+1);assert.equal(JSON.stringify(state.runs.filter(r=>r.agentId===configAgent)),historical);assert(state.audit.some(a=>a.action==='Agent configuration saved'&&a.agentId===configAgent));
+await assert.rejects(()=>service.saveAgentConfiguration(configAgent,configuration,owner.id),/changed after/);
+const outside=configurationFrom(state.agents.find(a=>a.id==='a-finance'),state.definitions.find(d=>d.agentId==='a-finance'));
+await assert.rejects(()=>service.saveAgentConfiguration('a-finance',outside,admin.id),/admin access/);
+const stale=configurationFrom(savedAgent,savedDefinition);await service.setAgentStatus(configAgent,'Paused',owner.id);await assert.rejects(()=>service.saveAgentConfiguration(configAgent,stale,owner.id),/changed after/);await service.setAgentStatus(configAgent,'Active',owner.id);
+for(let i=0;i<8;i++)service.tick();state=await service.load();const newRun=state.runs.find(r=>r.agentId===configAgent&&r.configurationRevision===savedDefinition.revision+2);assert(newRun);assert(newRun.tokens<=512);assert(state.toolCalls.filter(t=>t.runId===newRun.id).every(t=>t.name==='crm_lookup'));assert(newRun.steps.some(t=>t.kind==='Policy check'));
+const scopedSme=scopeStore(state,sme);assert.equal(scopedSme.connectors.length,0);assert(isUsableSnapshot(scopedSme));assert(scopedSme.definitions.every(d=>sme.agentIds.includes(d.agentId)));
+// Corrupt browser snapshots recover; expired approvals cannot be delegated even while feed is paused.
+const realWindow=globalThis.window,realStorage=globalThis.localStorage;
+let saved=JSON.stringify({version:1,runs:[],users:[{id:'broken'}]});
+globalThis.window={};globalThis.localStorage={getItem:()=>saved,setItem:(_k,v)=>{saved=v}};
+assert.equal((await createMockService().load()).agents.length,createSeed().agents.length);
+const legacy=createSeed();delete legacy.definitions;legacy.users.find(u=>u.id==='u-owner').name='Alex Morgan';legacy.approvals[0].note='Historical review note preserved';saved=JSON.stringify(legacy);const migrated=await createMockService().load();assert.equal(migrated.users.find(u=>u.id==='u-owner').name,'Workspace owner');assert.equal(migrated.definitions.length,legacy.agents.length);assert.equal(migrated.approvals[0].note,'Historical review note preserved');assert.deepEqual(migrated.runs,legacy.runs);
+const expired=createSeed();const exp=expired.approvals.find(a=>a.status==='Pending');exp.expiresAt=new Date(Date.now()-1000).toISOString();saved=JSON.stringify(expired);
+const expiredService=createMockService();const loaded=await expiredService.load();assert.equal(loaded.approvals.find(a=>a.id===exp.id).status,'Expired');assert(loaded.audit.some(a=>a.target===exp.id&&a.action==='Approval expired'));
+await assert.rejects(()=>expiredService.assign(exp.id,owner.id,'Too late',owner.id),/Completed/);
+const broken=structuredClone(seed);broken.runs[0].steps=null;assert.equal(isUsableSnapshot(broken),false);
+if(realWindow===undefined)delete globalThis.window;else globalThis.window=realWindow;
+if(realStorage===undefined)delete globalThis.localStorage;else globalThis.localStorage=realStorage;
+// The future HTTP adapter surfaces actionable errors and rejects incomplete responses.
+const originalFetch=globalThis.fetch;
+globalThis.fetch=async()=>new Response(JSON.stringify({detail:[{msg:'Missing review note'}]}),{status:422});
+await assert.rejects(()=>createFastApiService('https://example.invalid').decide('APR-1','Approved','','u-owner'),/Missing review note/);
+globalThis.fetch=async()=>new Response('[]',{status:200});
+await assert.rejects(()=>createFastApiService('https://example.invalid').load(),/incomplete records/);
+const apiScoped=scopeStore(seed,seed.users.find(u=>u.id==='u-sme'));apiScoped.users.sort((a,b)=>(a.id==='u-sme'?-1:0)-(b.id==='u-sme'?-1:0));
+const collections={'agents':'agents','runs':'runs','tool-calls':'toolCalls','policy-events':'policies','approvals':'approvals','users':'users','assignments':'assignments','audit-events':'audit','connectors':'connectors','agent-definitions':'definitions','global-policies':'globalPolicies'};
+globalThis.fetch=async url=>new Response(JSON.stringify(apiScoped[collections[String(url).split('/api/')[1]]]),{status:200});
+const apiLoaded=await createFastApiService('https://example.invalid').load();assert.equal(apiLoaded.users[0].id,'u-sme');assert.equal(apiLoaded.connectors.length,0);assert(apiLoaded.definitions.every(d=>sme.agentIds.includes(d.agentId)));
+globalThis.fetch=originalFetch;
+console.log('Governance checks passed: role scope, delegation, duplicate guards, decisions, audit, policy remediation, connector states, telemetry integrity, reset, configuration transactions, graph validation, scoped snapshots, legacy migration, and owner identity.');
