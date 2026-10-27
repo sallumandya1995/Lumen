@@ -4,19 +4,17 @@
 
 Lumen is a workspace for understanding how an LLM makes its choices, and for keeping AI agents under human control. It runs on **NVIDIA Nemotron** through **Nebius Token Factory**.
 
-Built for the Nebius x NVIDIA Global AI Hackathon.
+Built for the Nebius x NVIDIA Global AI Hackathon, **Best Apps and Agents** track. Licensed under MIT.
 
-  <img width="615" height="895" alt="image" src="https://github.com/user-attachments/assets/e3be076a-db87-4861-8b94-b92b528c0858" />
+<img src="https://github.com/user-attachments/assets/e3be076a-db87-4861-8b94-b92b528c0858" alt="Lumen home screen" width="420">
 
-
-
-## Demo on youyube
+## Demo
 
 [![Lumen demo video, click to watch](docs/demo-1m10.png)](https://youtu.be/184OR9FK-8s?t=70)
 
 Click the image to watch the full demo on YouTube (it opens at 1:10, where the product walkthrough starts): https://youtu.be/184OR9FK-8s
 
-- Live app on chatgpt sites: https://azure-glass-chat.dewygrass128.chatgpt.site
+- Live app: https://azure-glass-chat.dewygrass128.chatgpt.site
 
 ## Why I built this
 
@@ -58,18 +56,27 @@ The human gate has three steps: **detect** a policy signal or sensitive action, 
 
 ## How Lumen uses Nemotron and Nebius
 
-- **Nemotron 3 Ultra** is the default model for chat, guided generation, agent runs and the governance copilot. I used it as-is, with prompt engineering only and no fine-tuning.
-- **Nebius Token Factory** serves every live model call and returns the token logprobs and top alternatives that make inspection possible.
-- **Other Token Factory models** (DeepSeek V4 Pro, for example) can be compared against Nemotron in Experiments. Model choice is configurable per chat, variant and agent.
+- **NVIDIA Nemotron 3 Ultra** is the default model for chat, guided generation, agent runs and the governance copilot. I used it as-is, with prompt engineering only and no fine-tuning.
+- **Nebius Token Factory** serves every live model call. It returns the token logprobs and top alternatives that make inspection possible, so there was no GPU setup to manage and the app scales by calling the API.
+- **One API, many models.** Other Token Factory models (DeepSeek V4 Pro, for example) can be compared against Nemotron in Experiments. Model choice is configurable per chat, variant and agent, with no changes to the inspection or governance layers.
+
+## Setup and run
+
+Requires Python 3.11+ and Node.js 24.
+
+```bash
+git clone https://github.com/sallumandya1995/Lumen.git
+cd Lumen
+export NEBIUS_API_KEY="your-token-factory-key"
+export TAVILY_API_KEY="your-tavily-key"  # Optional: enables web search
+python3 app.py
+```
+
+Open http://localhost:7860. First startup installs dependencies, builds the app, and initializes the database. Keep API keys in environment variables; never commit them.
 
 ## What's next
 
 Reusable bias and regression evaluation suites, richer trace exports, policy templates and approval routing, broader MCP and framework connectors, and drift monitoring with incident replay.
-
-## More
-
-- Project details: [README_PROJECT.md](README_PROJECT.md)
-- License: MIT
 
 ## Author
 
